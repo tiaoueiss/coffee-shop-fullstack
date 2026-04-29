@@ -24,6 +24,60 @@ exports.indexByRole = async (req, res) => {
   }
 };
 
+// GET /users/new — show create staff form (admin only)
+exports.newForm = (req, res) => {
+  res.render('users/new', { user: req.user, error: null });
+};
+
+// POST /users — create a staff account (admin only)
+exports.create = async (req, res) => {
+  try {
+    const { name, email, phone, password, role } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).render('users/new', {
+        user: req.user,
+        error: 'Name, email, password, and role are required'
+      });
+    }
+
+    if (!['employee', 'admin'].includes(role)) {
+      return res.status(400).render('users/new', {
+        user: req.user,
+        error: 'Role must be employee or admin'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).render('users/new', {
+        user: req.user,
+        error: 'Password must be at least 6 characters'
+      });
+    }
+
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return res.status(400).render('users/new', {
+        user: req.user,
+        error: 'Email already registered'
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({
+      name,
+      email: email.toLowerCase(),
+      phone,
+      password: hashedPassword,
+      role
+    });
+
+    res.redirect('/users');
+  } catch (err) {
+    res.status(500).render('users/new', { user: req.user, error: err.message });
+  }
+};
+
 // GET /users/:id — show one user's profile
 exports.show = async (req, res) => {
   try {

@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">Edit Product</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/products/<%= product._id %>?_method=PUT" method="POST">
+      <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" value="<%= product.name %>" required>
+      </div>
+      <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="2"><%= product.description || '' %></textarea>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label>Price ($)</label>
+          <input type="number" name="price" class="form-control" step="0.01" min="0" value="<%= product.price %>" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Size</label>
+          <select name="size" class="form-select">
+            <option value="Small" <%= product.size === 'Small' ? 'selected' : '' %>>Small</option>
+            <option value="Medium" <%= product.size === 'Medium' ? 'selected' : '' %>>Medium</option>
+            <option value="Large" <%= product.size === 'Large' ? 'selected' : '' %>>Large</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Inventory</label>
+          <input type="number" name="inventory" class="form-control" min="0" value="<%= product.inventory %>">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label>Category</label>
+        <select name="category" class="form-select" required>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat._id %>" <%= product.category?.toString() === cat._id.toString() ? 'selected' : '' %>><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" name="isAvailable" id="isAvailable" class="form-check-input" <%= product.isAvailable ? 'checked' : '' %>>
+        <label class="form-check-label" for="isAvailable">Available for order</label>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Save</button>
+      <a href="/products/<%= product._id %>" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

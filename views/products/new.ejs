@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">New Product</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/products" method="POST">
+      <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="2"></textarea>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label>Price ($)</label>
+          <input type="number" name="price" class="form-control" step="0.01" min="0" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Size</label>
+          <select name="size" class="form-select">
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Initial Inventory</label>
+          <input type="number" name="inventory" class="form-control" min="0" value="0">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label>Category</label>
+        <select name="category" class="form-select" required>
+          <option value="">Select category...</option>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat._id %>"><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" name="isAvailable" id="isAvailable" class="form-check-input" checked>
+        <label class="form-check-label" for="isAvailable">Available for order</label>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Create</button>
+      <a href="/products" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

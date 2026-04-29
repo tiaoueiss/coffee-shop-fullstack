@@ -90,7 +90,7 @@ exports.editForm = async (req, res) => {
 // PUT /products/:id — update product (admin only)
 exports.update = async (req, res) => {
   try {
-    const { name, description, price, size, isAvailable, category } = req.body;
+    const { name, description, price, size, isAvailable, category, inventory } = req.body;
 
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -100,7 +100,8 @@ exports.update = async (req, res) => {
         price,
         size,
         isAvailable: isAvailable === 'on' || isAvailable === 'true',
-        category
+        category,
+        ...(inventory !== undefined && { inventory: parseInt(inventory) })
       },
       { new: true, runValidators: true }
     );
@@ -117,6 +118,50 @@ exports.update = async (req, res) => {
       product, categories, user: req.user,
       error: err.message
     });
+  }
+};
+
+// GET /products/:id/restock — show restock form (admin only)
+exports.restockForm = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).render('error', { message: 'Product not found' });
+    }
+    res.render('products/restock', { product, user: req.user, error: null });
+  } catch (err) {
+    res.status(500).render('error', { message: err.message });
+  }
+};
+
+// POST /products/:id/restock — add stock (admin only)
+exports.restock = async (req, res) => {
+  try {
+    const quantity = parseInt(req.body.quantity);
+    if (!quantity || quantity < 1) {
+      const product = await Product.findById(req.params.id);
+      return res.status(400).render('products/restock', {
+        product, user: req.user,
+        error: 'Please enter a valid quantity greater than 0'
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        $inc: { inventory: quantity },
+        isAvailable: true
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).render('error', { message: 'Product not found' });
+    }
+
+    res.redirect(`/products/${req.params.id}`);
+  } catch (err) {
+    res.status(500).render('error', { message: err.message });
   }
 };
 

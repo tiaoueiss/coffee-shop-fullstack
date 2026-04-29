@@ -1,27 +1,14 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/sqlite.js");
+const mongoose = require('mongoose');
 
-const Feedback = sequelize.define("Feedback", {
-  customerName: {
-    type: DataTypes.STRING,
-    allowNull: false,
+const feedbackSchema = new mongoose.Schema(
+  {
+    user:         { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    customerName: { type: String, required: true },
+    email:        { type: String, required: true },
+    rating:       { type: Number, required: true, min: 1, max: 5 },
+    comment:      { type: String }
   },
-  email: {
-    type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-  },
-  rating: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 1,
-      max: 5,
-    },
-  },
-  comment: {
-    type: DataTypes.TEXT,
-  },
-});
+  { timestamps: true }
+);
 
-module.exports = Feedback;
+module.exports = mongoose.model('Feedback', feedbackSchema);

@@ -1,10 +1,16 @@
-// controllers/authController.js
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '24h';
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 24 * 60 * 60 * 1000
+};
 
 // Helper: generate a signed JWT for a user
 const generateToken = (user) => {
@@ -30,13 +36,13 @@ exports.showRegisterForm = (req, res) => {
 // POST /register — process registration
 exports.register = async (req, res) => {
   try {
-    const { name, email, phone, password, confirmPassword } = req.body;
+    const { name, username, email, phone, password, confirmPassword } = req.body;
 
     // Basic validation
-    if (!name || !email || !phone || !password) {
-      return res.status(400).render('auth/register', { 
-        error: 'All fields are required', 
-        user: null 
+    if (!name || !username || !email || !password) {
+      return res.status(400).render('auth/register', {
+        error: 'All fields are required',
+        user: null
       });
     }
 
@@ -69,6 +75,7 @@ exports.register = async (req, res) => {
     // Always register as 'customer' from public form; admins/employees created via admin route
     const newUser = await User.create({
       name,
+      username,
       email: email.toLowerCase(),
       phone,
       password: hashedPassword,

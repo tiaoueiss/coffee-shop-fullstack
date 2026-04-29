@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">Edit Profile</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/users/<%= foundUser._id %>?_method=PUT" method="POST">
+      <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" value="<%= foundUser.name %>" required>
+      </div>
+      <div class="mb-3">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" value="<%= foundUser.username || '' %>">
+      </div>
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" value="<%= foundUser.email %>" required>
+      </div>
+      <div class="mb-3">
+        <label>Phone</label>
+        <input type="text" name="phone" class="form-control" value="<%= foundUser.phone || '' %>">
+      </div>
+      <div class="mb-3">
+        <label>New Password <small class="text-muted">(leave blank to keep current)</small></label>
+        <input type="password" name="password" class="form-control" minlength="6">
+      </div>
+      <% if (user.role === 'admin') { %>
+      <div class="mb-3">
+        <label>Role</label>
+        <select name="role" class="form-select">
+          <option value="customer" <%= foundUser.role === 'customer' ? 'selected' : '' %>>Customer</option>
+          <option value="employee" <%= foundUser.role === 'employee' ? 'selected' : '' %>>Employee</option>
+          <option value="admin" <%= foundUser.role === 'admin' ? 'selected' : '' %>>Admin</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label>Loyalty Points</label>
+        <input type="number" name="loyaltyPoints" class="form-control" value="<%= foundUser.loyaltyPoints %>" min="0">
+      </div>
+      <% } %>
+      <button type="submit" class="btn btn-coffee me-2">Save Changes</button>
+      <a href="/users/<%= foundUser._id %>" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

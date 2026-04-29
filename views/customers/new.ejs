@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">Add Staff Account</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/users" method="POST">
+      <div class="mb-3">
+        <label>Full Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Phone</label>
+        <input type="text" name="phone" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required minlength="6">
+      </div>
+      <div class="mb-3">
+        <label>Role</label>
+        <select name="role" class="form-select" required>
+          <option value="">Select role...</option>
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Create Account</button>
+      <a href="/users" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

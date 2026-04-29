@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 exports.index = async (req, res) => {
   try {
     const users = await User.find().select('-password');
-    res.render('users/index', { users, user: req.user });
+    res.render('customers/index', { users, user: req.user });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }
@@ -18,15 +18,15 @@ exports.indexByRole = async (req, res) => {
   try {
     const filter = req.query.role ? { role: req.query.role } : {};
     const users = await User.find(filter).select('-password');
-    res.render('users/index', { users, user: req.user });
+    res.render('customers/index', { users, user: req.user });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }
 };
 
-// GET /users/new — show create staff form (admin only)
+// GET /customers/new — show create staff form (admin only)
 exports.newForm = (req, res) => {
-  res.render('users/new', { user: req.user, error: null });
+  res.render('customers/new', { user: req.user, error: null });
 };
 
 // POST /users — create a staff account (admin only)
@@ -35,21 +35,21 @@ exports.create = async (req, res) => {
     const { name, email, phone, password, role } = req.body;
 
     if (!name || !email || !password || !role) {
-      return res.status(400).render('users/new', {
+      return res.status(400).render('customers/new', {
         user: req.user,
         error: 'Name, email, password, and role are required'
       });
     }
 
     if (!['employee', 'admin'].includes(role)) {
-      return res.status(400).render('users/new', {
+      return res.status(400).render('customers/new', {
         user: req.user,
         error: 'Role must be employee or admin'
       });
     }
 
     if (password.length < 6) {
-      return res.status(400).render('users/new', {
+      return res.status(400).render('customers/new', {
         user: req.user,
         error: 'Password must be at least 6 characters'
       });
@@ -57,7 +57,7 @@ exports.create = async (req, res) => {
 
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
-      return res.status(400).render('users/new', {
+      return res.status(400).render('customers/new', {
         user: req.user,
         error: 'Email already registered'
       });
@@ -74,11 +74,11 @@ exports.create = async (req, res) => {
 
     res.redirect('/users');
   } catch (err) {
-    res.status(500).render('users/new', { user: req.user, error: err.message });
+    res.status(500).render('customers/new', { user: req.user, error: err.message });
   }
 };
 
-// GET /users/:id — show one user's profile
+// GET /customers/:id — show one user's profile
 exports.show = async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.id).select('-password');
@@ -92,13 +92,13 @@ exports.show = async (req, res) => {
       return res.status(403).render('error', { message: 'You can only view your own profile' });
     }
 
-    res.render('users/show', { foundUser, user: req.user });
+    res.render('customers/show', { foundUser, user: req.user });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }
 };
 
-// GET /users/:id/edit — show edit form
+// GET /customers/:id/edit — show edit form
 exports.editForm = async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.id).select('-password');
@@ -112,13 +112,13 @@ exports.editForm = async (req, res) => {
       return res.status(403).render('error', { message: 'You can only edit your own profile' });
     }
 
-    res.render('users/edit', { foundUser, user: req.user, error: null });
+    res.render('customers/edit', { foundUser, user: req.user, error: null });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }
 };
 
-// PUT /users/:id — update user
+// PUT /customers/:id — update user
 exports.update = async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.id);
@@ -132,8 +132,8 @@ exports.update = async (req, res) => {
       return res.status(403).render('error', { message: 'You can only edit your own profile' });
     }
 
-    const { name, email, phone } = req.body;
-    const updateData = { name, email, phone };
+    const { name, username, email, phone } = req.body;
+    const updateData = { name, username, email, phone };
 
     // Only admins can change loyalty points or role
     if (req.user.role === 'admin') {
@@ -147,13 +147,13 @@ exports.update = async (req, res) => {
     }
 
     await User.findByIdAndUpdate(req.params.id, updateData, { runValidators: true });
-    res.redirect(`/users/${req.params.id}`);
+    res.redirect(`/customers/${req.params.id}`);
   } catch (err) {
     res.status(400).render('error', { message: err.message });
   }
 };
 
-// DELETE /users/:id — delete user (admin only)
+// DELETE /customers/:id — delete user (admin only)
 exports.delete = async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.id);
@@ -169,7 +169,7 @@ exports.delete = async (req, res) => {
   }
 };
 
-// GET /users/:id/orders — show all orders for a user
+// GET /customers/:id/orders — show all orders for a user
 exports.showOrders = async (req, res) => {
   try {
     // Customers can only view their own orders
@@ -186,7 +186,7 @@ exports.showOrders = async (req, res) => {
       .populate('products.product')
       .sort({ orderDate: -1 });
 
-    res.render('users/orders', { foundUser, orders, user: req.user });
+    res.render('customers/orders', { foundUser, orders, user: req.user });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }

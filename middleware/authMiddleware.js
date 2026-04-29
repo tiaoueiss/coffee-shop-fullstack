@@ -1,12 +1,37 @@
-const authMiddleware = (req, res, next) => {
-  const token = req.header("Authorization");
+const jwt = require('jsonwebtoken');
 
-  if (!token) return res.status(401).json({ error: "Access denied" });
+// Strict — blocks unauthenticated requests
+exports.requireAuth = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) return res.redirect('/login');
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    res.locals.user = req.user;
     next();
-  } catch (err) {
-    res.status(400).json({ error: "Invalid token" });
+  } catch {
+    res.clearCookie('token');
+    res.redirect('/login');
   }
+};
+
+// Soft — attaches user if logged in, never blocks
+exports.attachUser = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (token) {
+    try {
+      req.user = jwt.verify(token, process.env.JWT_SECRET);
+      res.locals.user = req.user;
+    } catch {
+      res.clearCookie('token');
+    }
+  }
+  next();
+};
+
+// Role gate — call after requireAuth
+exports.requireRole = (...roles) => (req, res, next) => {
+  if (!req.user || !roles.includes(req.user.role)) {
+    return res.status(403).render('error', { message: 'Access denied' });
+  }
+  next();
 };

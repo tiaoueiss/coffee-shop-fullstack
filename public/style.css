@@ -1,0 +1,85 @@
+:root {
+  --green:       #217454;
+  --green-dark:  #195c42;
+  --green-light: #e8f5ef;
+  --brown:       #6F4E37;
+  --brown-light: #D2B48C;
+  --cream:       #FAF7F2;
+  --text:        #1a2e24;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--green);
+  border-color: var(--green);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--green-dark);
+  border-color: var(--green-dark);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(33, 116, 84, 0.1);
+}
+.card-header {
+  background-color: var(--green);
+  color: #fff;
+  border-radius: 12px 12px 0 0 !important;
+  font-weight: 600;
+}
+
+/* Tables */
+.table thead {
+  background-color: var(--green-light);
+  color: var(--text);
+}
+.table thead th {
+  border-bottom: 2px solid var(--green);
+}
+
+/* Page title */
+.page-title {
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* Stat cards */
+.stat-card {
+  border-left: 4px solid var(--green);
+}
+
+/* Status badges */
+.badge-pending   { background-color: #b87333; color: #fff; }
+.badge-completed { background-color: var(--green); color: #fff; }
+.badge-cancelled { background-color: #7a3b2e; color: #fff; }
+
+/* Stars */
+.stars { color: var(--brown); }
+
+/* Links */
+a { color: var(--green); }
+a:hover { color: var(--green-dark); }
+
+/* Form labels */
+label { font-weight: 500; }
+
+/* Accent line on headings */
+h2.page-title::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 3px;
+  background-color: var(--brown-light);
+  margin-top: 6px;
+  border-radius: 2px;
+}

@@ -1,0 +1,11 @@
+<%- include('./partials/header') %>
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6 text-center">
+    <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size:4rem;"></i>
+    <h2 class="page-title mt-3">Something went wrong</h2>
+    <p class="text-muted"><%= message %></p>
+    <a href="javascript:history.back()" class="btn btn-coffee me-2">Go Back</a>
+    <a href="/dashboard" class="btn btn-outline-secondary">Dashboard</a>
+  </div>
+</div>
+<%- include('./partials/footer') %>

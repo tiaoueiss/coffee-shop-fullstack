@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">New Category</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/categories" method="POST">
+      <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Create</button>
+      <a href="/categories" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

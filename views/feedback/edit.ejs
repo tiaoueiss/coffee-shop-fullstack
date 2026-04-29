@@ -1,0 +1,27 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">Edit Feedback</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/feedback/<%= feedback._id %>?_method=PUT" method="POST">
+      <div class="mb-3">
+        <label>Rating</label>
+        <select name="rating" class="form-select" required>
+          <option value="5" <%= feedback.rating == 5 ? 'selected' : '' %>>★★★★★ Excellent</option>
+          <option value="4" <%= feedback.rating == 4 ? 'selected' : '' %>>★★★★☆ Good</option>
+          <option value="3" <%= feedback.rating == 3 ? 'selected' : '' %>>★★★☆☆ Average</option>
+          <option value="2" <%= feedback.rating == 2 ? 'selected' : '' %>>★★☆☆☆ Poor</option>
+          <option value="1" <%= feedback.rating == 1 ? 'selected' : '' %>>★☆☆☆☆ Terrible</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label>Comment</label>
+        <textarea name="comment" class="form-control" rows="4"><%= feedback.comment || '' %></textarea>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Save</button>
+      <a href="/feedback/<%= feedback._id %>" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

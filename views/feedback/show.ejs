@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="page-title mb-0">Feedback</h2>
+  <% if (user.role === 'admin' || feedback.email === user.email) { %>
+    <a href="/feedback/<%= feedback._id %>/edit" class="btn btn-coffee">Edit</a>
+  <% } %>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">From</dt>
+      <dd class="col-sm-9"><%= feedback.customerName %></dd>
+      <dt class="col-sm-3">Email</dt>
+      <dd class="col-sm-9"><%= feedback.email %></dd>
+      <dt class="col-sm-3">Rating</dt>
+      <dd class="col-sm-9 stars"><%= '★'.repeat(feedback.rating) %><%= '☆'.repeat(5 - feedback.rating) %></dd>
+      <dt class="col-sm-3">Comment</dt>
+      <dd class="col-sm-9"><%= feedback.comment || '—' %></dd>
+      <dt class="col-sm-3">Date</dt>
+      <dd class="col-sm-9"><%= new Date(feedback.createdAt).toLocaleDateString() %></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="/feedback" class="btn btn-outline-secondary">Back</a>
+</div>
+<%- include('../partials/footer') %>

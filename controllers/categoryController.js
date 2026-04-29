@@ -1,57 +1,76 @@
-const Category = require("../models/Category.js");
+const Category = require('../models/Category');
 
-// Show all categories
-exports.getCategories = async (req, res) => {
-  const categories = await Category.find();
-  res.render("category/index", { categories });
-};
-
-// Show form to create new category
-exports.newCategoryForm = (req, res) => {
-if(req.user.role !== "admin") {
-  return res.status(403).render("error", { message: "Forbidden" });
-}
-  res.render("category/new");
-};
-// Create new category
-exports.createCategory = async (req, res) => {
-  if (!req.user || req.user.role !== "admin") {
-    return res.status(403).render("error", { message: "Forbidden" });
-  }
-
-  const { name, description } = req.body;
-
+// GET /categories
+exports.index = async (req, res) => {
   try {
-    await Category.create({ name, description });
-    res.redirect("/categories");
+    const categories = await Category.find();
+    res.render('categories/index', { categories, user: req.user });
   } catch (err) {
-    res.status(500).send("Error creating category");
+    res.status(500).render('error', { message: err.message });
   }
-};
-// Show form to edit category
-exports.editCategoryForm = async (req, res) => {
-  if(req.user.role !== "admin") {
-    return res.status(403).render("error", { message: "Forbidden" });
-  }
-  const category = await Category.findById(req.params.id);
-  res.render("category/edit", { category });
 };
 
-// Update category
-exports.updateCategory = async (req, res) => {
-  if(req.user.role !== "admin") {
-    return res.status(403).render("error", { message: "Forbidden" });
+// GET /categories/:id
+exports.show = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).render('error', { message: 'Category not found' });
+    res.render('categories/show', { category, user: req.user });
+  } catch (err) {
+    res.status(500).render('error', { message: err.message });
   }
-  const { name, description } = req.body;
-  await Category.findByIdAndUpdate(req.params.id, { name });
-  res.redirect("/categories");
 };
 
-// Delete category
-exports.deleteCategory = async (req, res) => {
-    if(req.user.role !== "admin") {
-    return res.status(403).render("error", { message: "Forbidden" });
+// GET /categories/new
+exports.newForm = (req, res) => {
+  res.render('categories/new', { user: req.user, error: null });
+};
+
+// POST /categories
+exports.create = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    await Category.create({ name, description });
+    res.redirect('/categories');
+  } catch (err) {
+    res.status(400).render('categories/new', { user: req.user, error: err.message });
   }
-  await Category.findByIdAndDelete(req.params.id);
-  res.redirect("/categories");
+};
+
+// GET /categories/:id/edit
+exports.editForm = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).render('error', { message: 'Category not found' });
+    res.render('categories/edit', { category, user: req.user, error: null });
+  } catch (err) {
+    res.status(500).render('error', { message: err.message });
+  }
+};
+
+// PUT /categories/:id
+exports.update = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      { name, description },
+      { new: true, runValidators: true }
+    );
+    if (!category) return res.status(404).render('error', { message: 'Category not found' });
+    res.redirect(`/categories/${req.params.id}`);
+  } catch (err) {
+    const category = await Category.findById(req.params.id);
+    res.status(400).render('categories/edit', { category, user: req.user, error: err.message });
+  }
+};
+
+// DELETE /categories/:id
+exports.delete = async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.redirect('/categories');
+  } catch (err) {
+    res.status(500).render('error', { message: err.message });
+  }
 };

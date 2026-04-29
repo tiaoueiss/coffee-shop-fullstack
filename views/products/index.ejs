@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="page-title mb-0">Products</h2>
+  <% if (user && user.role === 'admin') { %>
+    <a href="/products/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>New Product</a>
+  <% } %>
+</div>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+  <a href="/products" class="btn btn-sm btn-outline-secondary">All</a>
+  <% categories.forEach(cat => { %>
+    <a href="/products?category=<%= cat._id %>" class="btn btn-sm btn-outline-secondary"><%= cat.name %></a>
+  <% }) %>
+</div>
+
+<div class="row g-3">
+  <% products.forEach(product => { %>
+  <div class="col-md-4">
+    <div class="card h-100 <%= !product.isAvailable ? 'opacity-50' : '' %>">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <h5 class="card-title"><%= product.name %></h5>
+          <span class="badge bg-secondary"><%= product.size %></span>
+        </div>
+        <p class="text-muted small"><%= product.description || '' %></p>
+        <p class="mb-1"><span class="fw-bold text-coffee fs-5">$<%= product.price.toFixed(2) %></span></p>
+        <p class="mb-0 small">
+          <% if (product.isAvailable) { %>
+            <span class="text-success"><i class="bi bi-check-circle me-1"></i>In stock (<%= product.inventory %>)</span>
+          <% } else { %>
+            <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of stock</span>
+          <% } %>
+        </p>
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <a href="/products/<%= product._id %>" class="btn btn-sm btn-coffee">View</a>
+        <% if (user && user.role === 'admin') { %>
+          <a href="/products/<%= product._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <a href="/products/<%= product._id %>/restock" class="btn btn-sm btn-outline-success">Restock</a>
+          <form action="/products/<%= product._id %>?_method=DELETE" method="POST"
+                onsubmit="return confirm('Delete this product?')">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<%- include('../partials/footer') %>

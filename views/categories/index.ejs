@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="page-title mb-0">Categories</h2>
+  <% if (user.role === 'admin') { %>
+    <a href="/categories/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>New Category</a>
+  <% } %>
+</div>
+
+<div class="row g-3">
+  <% categories.forEach(cat => { %>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5><%= cat.name %></h5>
+        <p class="text-muted small"><%= cat.description || 'No description' %></p>
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <a href="/categories/<%= cat._id %>" class="btn btn-sm btn-coffee">View</a>
+        <% if (user.role === 'admin') { %>
+          <a href="/categories/<%= cat._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <form action="/categories/<%= cat._id %>?_method=DELETE" method="POST"
+                onsubmit="return confirm('Delete this category?')">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<%- include('../partials/footer') %>

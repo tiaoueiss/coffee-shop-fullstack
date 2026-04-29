@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="page-title mb-0">Orders</h2>
+  <a href="/orders/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>New Order</a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <% if (orders.length === 0) { %>
+      <p class="text-muted p-3 mb-0">No orders found.</p>
+    <% } else { %>
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <% if (user.role !== 'customer') { %><th>Customer</th><% } %>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach((order, i) => { %>
+        <tr>
+          <td><small class="text-muted"><%= order._id.toString().slice(-6) %></small></td>
+          <% if (user.role !== 'customer') { %><td><%= order.customer?.name || '—' %></td><% } %>
+          <td><%= order.products.length %></td>
+          <td>$<%= order.totalAmount %></td>
+          <td><span class="badge badge-<%= order.status %>"><%= order.status %></span></td>
+          <td><%= new Date(order.orderDate).toLocaleDateString() %></td>
+          <td>
+            <a href="/orders/<%= order._id %>" class="btn btn-sm btn-coffee">View</a>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

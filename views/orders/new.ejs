@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">New Order</h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form action="/orders" method="POST">
+
+      <% if (user.role !== 'customer') { %>
+      <div class="mb-4">
+        <label class="fw-bold">Customer</label>
+        <select name="customerId" class="form-select" required>
+          <option value="">Select customer...</option>
+          <% customers.forEach(c => { %>
+            <option value="<%= c._id %>"><%= c.name %> (<%= c.email %>)</option>
+          <% }) %>
+        </select>
+      </div>
+      <% } %>
+
+      <label class="fw-bold mb-2">Products</label>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Quantity</th></tr></thead>
+          <tbody>
+            <% products.forEach((product, i) => { %>
+            <tr>
+              <td>
+                <input type="hidden" name="productIds[]" value="<%= product._id %>">
+                <%= product.name %>
+              </td>
+              <td><small class="text-muted"><%= product.category?.name || '—' %></small></td>
+              <td>$<%= product.price.toFixed(2) %></td>
+              <td><%= product.inventory %></td>
+              <td style="width:100px">
+                <input type="number" name="quantities[]" class="form-control form-control-sm"
+                       min="0" max="<%= product.inventory %>" value="0">
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <button type="submit" class="btn btn-coffee me-2">Place Order</button>
+      <a href="/orders" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

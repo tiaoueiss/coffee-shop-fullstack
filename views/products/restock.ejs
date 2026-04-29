@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<h2 class="page-title">Restock: <%= product.name %></h2>
+
+<div class="card">
+  <div class="card-body">
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <p class="text-muted">Current stock: <strong><%= product.inventory %></strong> units</p>
+    <form action="/products/<%= product._id %>/restock" method="POST">
+      <div class="mb-3">
+        <label>Quantity to Add</label>
+        <input type="number" name="quantity" class="form-control" min="1" required>
+      </div>
+      <button type="submit" class="btn btn-coffee me-2">Add Stock</button>
+      <a href="/products/<%= product._id %>" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>

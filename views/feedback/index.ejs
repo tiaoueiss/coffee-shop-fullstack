@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="page-title mb-0">Feedback</h2>
+  <a href="/feedback/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>Leave Feedback</a>
+</div>
+
+<div class="row g-3">
+  <% feedbacks.forEach(fb => { %>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <strong><%= fb.customerName %></strong>
+          <span class="stars"><%= '★'.repeat(fb.rating) %><%= '☆'.repeat(5 - fb.rating) %></span>
+        </div>
+        <p class="text-muted small mb-1"><%= fb.email %> · <%= new Date(fb.createdAt).toLocaleDateString() %></p>
+        <p class="mb-0"><%= fb.comment || '' %></p>
+      </div>
+      <div class="card-footer d-flex gap-2">
+        <a href="/feedback/<%= fb._id %>" class="btn btn-sm btn-coffee">View</a>
+        <% if (user.role === 'admin' || fb.email === user.email) { %>
+          <a href="/feedback/<%= fb._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <form action="/feedback/<%= fb._id %>?_method=DELETE" method="POST"
+                onsubmit="return confirm('Delete this feedback?')">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<%- include('../partials/footer') %>

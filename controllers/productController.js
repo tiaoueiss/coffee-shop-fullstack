@@ -55,13 +55,12 @@ exports.newForm = async (req, res) => {
 // POST /products — create product (admin only)
 exports.create = async (req, res) => {
   try {
-    const { name, description, price, size, isAvailable, category } = req.body;
+    const { name, description, price, isAvailable, category } = req.body;
 
     await Product.create({
       name,
       description,
       price,
-      size,
       isAvailable: isAvailable === 'on' || isAvailable === 'true',
       category
     });
@@ -97,7 +96,7 @@ exports.editForm = async (req, res) => {
 // PUT /products/:id — update product (admin only)
 exports.update = async (req, res) => {
   try {
-    const { name, description, price, size, isAvailable, category, inventory } = req.body;
+    const { name, description, price, isAvailable, category, inventory } = req.body;
 
     const product = await Product.findByIdAndUpdate(
       req.params.id,
@@ -105,7 +104,6 @@ exports.update = async (req, res) => {
         name,
         description,
         price,
-        size,
         isAvailable: isAvailable === 'on' || isAvailable === 'true',
         category,
         ...(inventory !== undefined && { inventory: parseInt(inventory) })

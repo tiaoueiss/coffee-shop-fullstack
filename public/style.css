@@ -1,96 +1,160 @@
+/* ── Variables ────────────────────────────────────────────── */
 :root {
   --green:       #217454;
-  --green-dark:  #195c42;
+  --green-dark:  #0d5e36;
   --green-light: #e8f5ef;
   --brown:       #6F4E37;
   --brown-light: #D2B48C;
-  --cream:       #FAF7F2;
-  --text:        #1a2e24;
+  --cream:       #fbf9f8;
+  --surface:     #f5f3f3;
+  --text:        #1b1c1c;
+  --text-muted:  #5f5e5e;
+  --border:      #e4e2e2;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/* ── Base ─────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--cream);
   color: var(--text);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-main {
-  flex: 1;
+main { flex: 1; }
+
+h1, h2, h3, h4, h5, h6,
+.page-title, .navbar-brand {
+  font-family: 'Epilogue', sans-serif;
 }
 
-/* Buttons */
+/* ── Navbar ───────────────────────────────────────────────── */
+.stories-nav {
+  background-color: var(--green-dark);
+  padding: 0.6rem 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.stories-nav .nav-link { color: rgba(255,255,255,0.85) !important; font-size: 0.875rem; }
+.stories-nav .nav-link:hover { color: #fff !important; }
+.stories-brand {
+  font-family: 'Epilogue', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
 .btn-primary {
   background-color: var(--green);
   border-color: var(--green);
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .btn-primary:hover, .btn-primary:focus {
   background-color: var(--green-dark);
   border-color: var(--green-dark);
 }
-
-/* Cards */
-.card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(33, 116, 84, 0.1);
-}
-.card-header {
+.btn-coffee {
   background-color: var(--green);
+  border-color: var(--green);
   color: #fff;
-  border-radius: 12px 12px 0 0 !important;
   font-weight: 600;
 }
-
-/* Tables */
-.table thead {
-  background-color: var(--green-light);
-  color: var(--text);
+.btn-coffee:hover {
+  background-color: var(--green-dark);
+  border-color: var(--green-dark);
+  color: #fff;
 }
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  background: #fff;
+}
+.card-header {
+  background-color: var(--green-dark);
+  color: #fff;
+  border-radius: 11px 11px 0 0 !important;
+  font-family: 'Epilogue', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  padding: 0.85rem 1.25rem;
+}
+
+/* ── Tables ───────────────────────────────────────────────── */
 .table thead th {
-  border-bottom: 2px solid var(--green);
+  background-color: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
 }
+.table td { vertical-align: middle; font-size: 0.9rem; }
 
-/* Page title */
+/* ── Page title ───────────────────────────────────────────── */
 .page-title {
-  color: var(--green);
+  color: var(--green-dark);
   font-weight: 700;
   margin-bottom: 1.5rem;
+  font-size: 1.6rem;
 }
 
-/* Stat cards */
+/* ── Stat cards ───────────────────────────────────────────── */
 .stat-card {
-  border-left: 4px solid var(--green);
+  border-left: 3px solid var(--green);
+  background: #fff;
 }
+.stat-card .text-muted { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-card .fs-2 { color: var(--green-dark); }
 
-/* Status badges */
-.badge-pending   { background-color: #b87333; color: #fff; }
-.badge-completed { background-color: var(--green); color: #fff; }
-.badge-cancelled { background-color: #7a3b2e; color: #fff; }
+/* ── Status badges ────────────────────────────────────────── */
+.badge-pending   { background-color: #b87333; color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
+.badge-completed { background-color: var(--green); color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
+.badge-cancelled { background-color: #7a3b2e; color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
 
-/* Stars */
+/* ── Role filter pills ────────────────────────────────────── */
+.role-pill {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: #fff;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.role-pill:hover { border-color: var(--green); color: var(--green); }
+.role-pill.active { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* ── Stars ────────────────────────────────────────────────── */
 .stars { color: var(--brown); }
 
-/* Links */
-a { color: var(--green); }
-a:hover { color: var(--green-dark); }
+/* ── Form labels ──────────────────────────────────────────── */
+label { font-weight: 500; font-size: 0.875rem; color: var(--text-muted); }
+.form-control, .form-select {
+  border-color: var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(33,116,84,0.12);
+}
 
-/* Form labels */
-label { font-weight: 500; }
-
-/* Accent line on headings */
-h2.page-title::after {
-  content: '';
-  display: block;
-  width: 48px;
-  height: 3px;
-  background-color: var(--brown-light);
-  margin-top: 6px;
-  border-radius: 2px;
+/* ── Auth cards ───────────────────────────────────────────── */
+.auth-wrapper {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

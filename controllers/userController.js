@@ -3,22 +3,12 @@ const User = require('../models/User');
 const Order = require('../models/Order');
 const bcrypt = require('bcrypt');
 
-// GET /users — list all users (admin only)
+// GET /users — list all users, optional ?role= filter (admin only)
 exports.index = async (req, res) => {
-  try {
-    const users = await User.find().select('-password');
-    res.render('customers/index', { users, user: req.user });
-  } catch (err) {
-    res.status(500).render('error', { message: err.message });
-  }
-};
-
-// GET /users?role=customer|employee|admin — filter by role (admin only)
-exports.indexByRole = async (req, res) => {
   try {
     const filter = req.query.role ? { role: req.query.role } : {};
     const users = await User.find(filter).select('-password');
-    res.render('customers/index', { users, user: req.user });
+    res.render('customers/index', { users, user: req.user, activeRole: req.query.role || '' });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }
@@ -32,12 +22,12 @@ exports.newForm = (req, res) => {
 // POST /users — create a staff account (admin only)
 exports.create = async (req, res) => {
   try {
-    const { name, email, phone, password, role } = req.body;
+    const { name, username, email, phone, password, role } = req.body;
 
-    if (!name || !email || !password || !role) {
+    if (!name || !username || !email || !password || !role) {
       return res.status(400).render('customers/new', {
         user: req.user,
-        error: 'Name, email, password, and role are required'
+        error: 'Name, username, email, password, and role are required'
       });
     }
 
@@ -66,6 +56,7 @@ exports.create = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
       name,
+      username,
       email: email.toLowerCase(),
       phone,
       password: hashedPassword,

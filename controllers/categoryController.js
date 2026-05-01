@@ -29,8 +29,8 @@ exports.newForm = (req, res) => {
 // POST /categories
 exports.create = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    await Category.create({ name, description });
+    const { name, description, image } = req.body;
+    await Category.create({ name, description, image: image || `${name}.png` });
     res.redirect('/categories');
   } catch (err) {
     res.status(400).render('categories/new', { user: req.user, error: err.message });
@@ -51,10 +51,10 @@ exports.editForm = async (req, res) => {
 // PUT /categories/:id
 exports.update = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, image } = req.body;
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      { name, description },
+      { name, description, image },
       { new: true, runValidators: true }
     );
     if (!category) return res.status(404).render('error', { message: 'Category not found' });

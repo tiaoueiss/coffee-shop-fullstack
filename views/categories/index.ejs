@@ -1,31 +1,63 @@
 <%- include('../partials/header') %>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h2 class="page-title mb-0">Categories</h2>
-  <% if (user.role === 'admin') { %>
-    <a href="/categories/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>New Category</a>
+  <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+    <a href="/categories/new" class="btn btn-primary btn-sm px-3">
+      <i class="bi bi-plus-lg me-1"></i>New Category
+    </a>
   <% } %>
 </div>
 
 <div class="row g-3">
   <% categories.forEach(cat => { %>
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5><%= cat.name %></h5>
-        <p class="text-muted small"><%= cat.description || 'No description' %></p>
-      </div>
-      <div class="card-footer d-flex gap-2">
-        <a href="/products?category=<%= cat._id %>" class="btn btn-sm btn-primary">View Menu</a>
-        <% if (user.role === 'admin') { %>
-          <a href="/categories/<%= cat._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+  <div class="col-6 col-md-4 col-lg-3">
+    <a href="/products?category=<%= cat._id %>" class="text-decoration-none">
+      <div class="card category-card h-100">
+        <div class="category-img-wrap">
+          <img
+            src="/images/categories/<%= cat.image || cat.name + '.png' %>"
+            alt="<%= cat.name %>"
+            class="category-img"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          >
+          <div class="category-placeholder" style="display:none;">
+            <span><%= cat.name.charAt(0) %></span>
+          </div>
+        </div>
+        <div class="card-body py-2 px-3">
+          <div class="fw-semibold text-dark" style="font-family:'Epilogue',sans-serif;font-size:0.9rem;"><%= cat.name %></div>
+          <% if (cat.description) { %>
+            <small class="text-muted" style="font-size:0.75rem;"><%= cat.description %></small>
+          <% } %>
+        </div>
+        <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+        <div class="card-footer py-2 px-3 d-flex gap-2 bg-transparent border-top-0">
+          <a href="/categories/<%= cat._id %>/edit" class="btn btn-sm btn-outline-secondary"
+             onclick="event.stopPropagation();">Edit</a>
           <form action="/categories/<%= cat._id %>?_method=DELETE" method="POST"
+                onclick="event.stopPropagation();"
                 onsubmit="return confirm('Delete this category?')">
             <button class="btn btn-sm btn-outline-danger">Delete</button>
           </form>
+        </div>
         <% } %>
       </div>
-    </div>
+    </a>
   </div>
   <% }) %>
 </div>
+
+<style>
+.category-card { transition: transform 0.15s, box-shadow 0.15s; cursor: pointer; overflow: hidden; }
+.category-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(33,116,84,0.15); }
+.category-img-wrap { position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; background: var(--green-light); }
+.category-img { width: 100%; height: 100%; object-fit: cover; }
+.category-placeholder {
+  position: absolute; inset: 0;
+  align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--green-light), #c8e6d8);
+  font-family: 'Epilogue', sans-serif;
+  font-size: 2.5rem; font-weight: 700; color: var(--green);
+}
+</style>
 <%- include('../partials/footer') %>

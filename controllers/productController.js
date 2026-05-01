@@ -1,6 +1,7 @@
 // controllers/productController.js
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const User = require('../models/User');
 
 // GET /products — list all products
 exports.index = async (req, res) => {
@@ -9,12 +10,18 @@ exports.index = async (req, res) => {
     if (req.query.category) filter.category = req.query.category;
     if (req.query.available === 'true') filter.isAvailable = true;
 
-    const [products, categories] = await Promise.all([
+    const queries = [
       Product.find(filter).populate('category', 'name'),
       Category.find()
-    ]);
+    ];
 
-    res.render('products/index', { products, categories, user: req.user });
+    if (req.user && req.user.role !== 'customer') {
+      queries.push(User.find({ role: 'customer' }).select('name email'));
+    }
+
+    const [products, categories, customers = []] = await Promise.all(queries);
+
+    res.render('products/index', { products, categories, customers, user: req.user, query: req.query.category || '' });
   } catch (err) {
     res.status(500).render('error', { message: err.message });
   }

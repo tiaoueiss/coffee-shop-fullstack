@@ -149,6 +149,6 @@ exports.login = async (req, res) => {
 
 // GET /logout — clear cookie and redirect
 exports.logout = (req, res) => {
-  res.clearCookie('token', cookieOptions);
+  res.clearCookie('token');
   res.redirect('/login');
 };

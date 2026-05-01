@@ -3,6 +3,11 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { attachUser } = require('../middleware/authMiddleware');
 
+router.get('/', attachUser, (req, res) => {
+  if (req.user) return res.redirect('/dashboard');
+  res.redirect('/login');
+});
+
 router.get('/register', attachUser, authController.showRegisterForm);
 router.post('/register', authController.register);
 router.get('/login', attachUser, authController.showLoginForm);

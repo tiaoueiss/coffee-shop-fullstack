@@ -8,10 +8,21 @@
   --text:        #1a2e24;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--cream);
   color: var(--text);
   font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
 }
 
 /* Buttons */

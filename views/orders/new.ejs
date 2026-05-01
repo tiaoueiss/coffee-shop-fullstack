@@ -1,50 +1,149 @@
 <%- include('../partials/header') %>
 <h2 class="page-title">New Order</h2>
 
-<div class="card">
-  <div class="card-body">
-    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
-    <form action="/orders" method="POST">
+<% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
 
-      <% if (user.role !== 'customer') { %>
-      <div class="mb-4">
-        <label class="fw-bold">Customer</label>
-        <select name="customerId" class="form-select" required>
-          <option value="">Select customer...</option>
-          <% customers.forEach(c => { %>
-            <option value="<%= c._id %>"><%= c.name %> (<%= c.email %>)</option>
-          <% }) %>
-        </select>
-      </div>
-      <% } %>
-
-      <label class="fw-bold mb-2">Products</label>
-      <div class="table-responsive">
-        <table class="table">
-          <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Quantity</th></tr></thead>
-          <tbody>
-            <% products.forEach((product, i) => { %>
-            <tr>
-              <td>
-                <input type="hidden" name="productIds[]" value="<%= product._id %>">
-                <%= product.name %>
-              </td>
-              <td><small class="text-muted"><%= product.category?.name || '—' %></small></td>
-              <td>$<%= product.price.toFixed(2) %></td>
-              <td><%= product.inventory %></td>
-              <td style="width:100px">
-                <input type="number" name="quantities[]" class="form-control form-control-sm"
-                       min="0" max="<%= product.inventory %>" value="0">
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-
-      <button type="submit" class="btn btn-coffee me-2">Place Order</button>
-      <a href="/orders" class="btn btn-outline-secondary">Cancel</a>
-    </form>
+<form action="/orders" method="POST" id="orderForm">
+  <% if (user.role !== 'customer') { %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <label class="fw-bold mb-1">Customer</label>
+      <select name="customerId" class="form-select" required>
+        <option value="">Select customer...</option>
+        <% customers.forEach(c => { %>
+          <option value="<%= c._id %>"><%= c.name %> (<%= c.email %>)</option>
+        <% }) %>
+      </select>
+    </div>
   </div>
-</div>
+  <% } %>
+
+  <div class="row g-4">
+
+    <!-- Products -->
+    <div class="col-lg-8">
+      <% const grouped = {}; %>
+      <% products.forEach(p => { const cat = p.category?.name || 'Other'; if (!grouped[cat]) grouped[cat] = []; grouped[cat].push(p); }); %>
+      <% Object.entries(grouped).forEach(([cat, items]) => { %>
+        <h6 class="text-muted text-uppercase fw-bold mb-2 mt-3"><%= cat %></h6>
+        <div class="row g-3 mb-2">
+          <% items.forEach(product => { %>
+          <div class="col-sm-6">
+            <div class="card product-card h-100" id="card-<%= product._id %>">
+              <div class="card-body d-flex justify-content-between align-items-center gap-3">
+                <div>
+                  <div class="fw-semibold"><%= product.name %></div>
+                  <small class="text-muted"><%= product.size %></small>
+                  <div class="fw-bold mt-1" style="color:var(--green);">$<%= product.price.toFixed(2) %></div>
+                  <small class="text-muted"><%= product.inventory %> left</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-secondary qty-btn"
+                          onclick="changeQty('<%= product._id %>', -1)" style="width:32px;">−</button>
+                  <span class="fw-bold fs-6 qty-display" id="qty-<%= product._id %>">0</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary qty-btn"
+                          onclick="changeQty('<%= product._id %>', 1, <%= product.inventory %>)" style="width:32px;">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top:16px;">
+        <div class="card-header">Order Summary</div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" id="summaryList">
+            <li class="list-group-item text-muted small" id="emptyMsg">No items yet — add something!</li>
+          </ul>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <span class="fw-bold">Total</span>
+          <span class="fw-bold fs-5" style="color:var(--green);" id="totalDisplay">$0.00</span>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary w-100" id="submitBtn" disabled>Place Order</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden inputs populated by JS before submit -->
+  <div id="hiddenInputs"></div>
+</form>
+
+<script>
+  const prices = {
+    <% products.forEach((p, i) => { %>'<%= p._id %>': <%= p.price %><% if (i < products.length - 1) { %>,<% } %><% }) %>
+  };
+  const names = {
+    <% products.forEach((p, i) => { %>'<%= p._id %>': '<%= p.name.replace(/'/g, "\\'") %>'<% if (i < products.length - 1) { %>,<% } %><% }) %>
+  };
+  const quantities = {};
+
+  function changeQty(id, delta, maxStock) {
+    const current = quantities[id] || 0;
+    let next = current + delta;
+    if (next < 0) next = 0;
+    if (maxStock !== undefined && next > maxStock) next = maxStock;
+    quantities[id] = next;
+
+    document.getElementById('qty-' + id).textContent = next;
+
+    const card = document.getElementById('card-' + id);
+    if (next > 0) {
+      card.style.borderColor = 'var(--green)';
+      card.style.borderWidth = '2px';
+      card.style.borderStyle = 'solid';
+    } else {
+      card.style.border = '';
+    }
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const list = document.getElementById('summaryList');
+    const emptyMsg = document.getElementById('emptyMsg');
+    const hiddenInputs = document.getElementById('hiddenInputs');
+    const submitBtn = document.getElementById('submitBtn');
+
+    list.innerHTML = '';
+    hiddenInputs.innerHTML = '';
+    let total = 0;
+    let hasItems = false;
+
+    for (const [id, qty] of Object.entries(quantities)) {
+      if (qty < 1) continue;
+      hasItems = true;
+      const subtotal = prices[id] * qty;
+      total += subtotal;
+
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      li.innerHTML = `<span>${names[id]} <span class="badge bg-secondary ms-1">x${qty}</span></span>
+                      <span>$${subtotal.toFixed(2)}</span>`;
+      list.appendChild(li);
+
+      hiddenInputs.innerHTML += `<input type="hidden" name="productIds[]" value="${id}">
+                                  <input type="hidden" name="quantities[]" value="${qty}">`;
+    }
+
+    if (!hasItems) {
+      const li = document.createElement('li');
+      li.id = 'emptyMsg';
+      li.className = 'list-group-item text-muted small';
+      li.textContent = 'No items yet — add something!';
+      list.appendChild(li);
+    }
+
+    document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+    submitBtn.disabled = !hasItems;
+  }
+</script>
 <%- include('../partials/footer') %>

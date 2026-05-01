@@ -1,50 +1,202 @@
 <%- include('../partials/header') %>
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="page-title mb-0">Products</h2>
-  <% if (user && user.role === 'admin') { %>
-    <a href="/products/new" class="btn btn-coffee"><i class="bi bi-plus-lg me-1"></i>New Product</a>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="page-title mb-0">Menu</h2>
+  <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+    <a href="/products/new" class="btn btn-sm btn-outline-secondary"><i class="bi bi-plus-lg me-1"></i>New Product</a>
   <% } %>
 </div>
 
-<div class="mb-3 d-flex gap-2 flex-wrap">
-  <a href="/products" class="btn btn-sm btn-outline-secondary">All</a>
+<!-- Category filter -->
+<div class="mb-4 d-flex gap-2 flex-wrap">
+  <a href="/products" class="btn btn-sm <%= query === '' ? 'btn-primary' : 'btn-outline-secondary' %>">All</a>
   <% categories.forEach(cat => { %>
-    <a href="/products?category=<%= cat._id %>" class="btn btn-sm btn-outline-secondary"><%= cat.name %></a>
+    <a href="/products?category=<%= cat._id %>"
+       class="btn btn-sm <%= query === cat._id.toString() ? 'btn-primary' : 'btn-outline-secondary' %>">
+      <%= cat.name %>
+    </a>
   <% }) %>
 </div>
 
+<% if (typeof user !== 'undefined' && user) { %>
+<!-- Order layout: menu + cart -->
+<form action="/orders" method="POST" id="orderForm">
+  <% if (user.role !== 'customer') { %>
+  <div class="card mb-4">
+    <div class="card-body py-2">
+      <div class="row align-items-center">
+        <label class="col-auto fw-semibold mb-0">Ordering for:</label>
+        <div class="col-md-4">
+          <select name="customerId" class="form-select form-select-sm" required>
+            <option value="">Select customer...</option>
+            <% customers.forEach(c => { %>
+              <option value="<%= c._id %>"><%= c.name %> (<%= c.email %>)</option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <div class="row g-4">
+    <!-- Products -->
+    <div class="col-lg-8">
+      <% const grouped = {}; %>
+      <% products.forEach(p => { const cat = p.category?.name || 'Other'; if (!grouped[cat]) grouped[cat] = []; grouped[cat].push(p); }); %>
+      <% Object.entries(grouped).forEach(([cat, items]) => { %>
+        <h6 class="text-muted text-uppercase fw-bold mb-2 mt-2 small"><%= cat %></h6>
+        <div class="row g-3 mb-3">
+          <% items.forEach(product => { %>
+          <div class="col-sm-6">
+            <div class="card product-card h-100" id="card-<%= product._id %>">
+              <div class="card-body d-flex justify-content-between align-items-center gap-2">
+                <div class="flex-grow-1">
+                  <div class="fw-semibold"><%= product.name %></div>
+                  <small class="text-muted"><%= product.size %> · <%= product.category?.name %></small>
+                  <div class="fw-bold" style="color:var(--green);">$<%= product.price.toFixed(2) %></div>
+                  <% if (!product.isAvailable || product.inventory === 0) { %>
+                    <small class="text-danger">Out of stock</small>
+                  <% } else { %>
+                    <small class="text-muted"><%= product.inventory %> left</small>
+                  <% } %>
+                </div>
+                <% if (product.isAvailable && product.inventory > 0) { %>
+                <div class="d-flex align-items-center gap-1">
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="changeQty('<%= product._id %>', -1)" style="width:30px;padding:0;">−</button>
+                  <span class="fw-bold text-center qty-display" id="qty-<%= product._id %>" style="min-width:24px;">0</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                          onclick="changeQty('<%= product._id %>', 1, <%= product.inventory %>)" style="width:30px;padding:0;">+</button>
+                </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      <% }) %>
+
+      <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+      <div class="mt-2 mb-4">
+        <% products.forEach(product => { %>
+          <% if (product.isAvailable) { %>
+          <span class="me-2">
+            <a href="/products/<%= product._id %>/edit" class="text-muted small">Edit <%= product.name %></a>
+          </span>
+          <% } %>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Cart -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top:16px;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-bag me-1"></i>Your Order</span>
+          <button type="button" class="btn btn-sm btn-outline-light" onclick="clearCart()">Clear</button>
+        </div>
+        <ul class="list-group list-group-flush" id="summaryList">
+          <li class="list-group-item text-muted small py-3 text-center" id="emptyMsg">
+            <i class="bi bi-bag-x d-block mb-1" style="font-size:1.5rem;"></i>Add items from the menu
+          </li>
+        </ul>
+        <div class="card-footer d-flex justify-content-between">
+          <span class="fw-bold">Total</span>
+          <span class="fw-bold fs-5" style="color:var(--green);" id="totalDisplay">$0.00</span>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary w-100" id="submitBtn" disabled>
+            <i class="bi bi-check-lg me-1"></i>Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="hiddenInputs"></div>
+</form>
+
+<% } else { %>
+<!-- Not logged in: read-only menu -->
 <div class="row g-3">
   <% products.forEach(product => { %>
   <div class="col-md-4">
-    <div class="card h-100 <%= !product.isAvailable ? 'opacity-50' : '' %>">
+    <div class="card h-100">
       <div class="card-body">
         <div class="d-flex justify-content-between">
-          <h5 class="card-title"><%= product.name %></h5>
+          <h6 class="fw-semibold"><%= product.name %></h6>
           <span class="badge bg-secondary"><%= product.size %></span>
         </div>
-        <p class="text-muted small"><%= product.description || '' %></p>
-        <p class="mb-1"><span class="fw-bold text-coffee fs-5">$<%= product.price.toFixed(2) %></span></p>
-        <p class="mb-0 small">
-          <% if (product.isAvailable) { %>
-            <span class="text-success"><i class="bi bi-check-circle me-1"></i>In stock (<%= product.inventory %>)</span>
-          <% } else { %>
-            <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of stock</span>
-          <% } %>
-        </p>
-      </div>
-      <div class="card-footer d-flex gap-2">
-        <a href="/products/<%= product._id %>" class="btn btn-sm btn-coffee">View</a>
-        <% if (user && user.role === 'admin') { %>
-          <a href="/products/<%= product._id %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
-          <a href="/products/<%= product._id %>/restock" class="btn btn-sm btn-outline-success">Restock</a>
-          <form action="/products/<%= product._id %>?_method=DELETE" method="POST"
-                onsubmit="return confirm('Delete this product?')">
-            <button class="btn btn-sm btn-outline-danger">Delete</button>
-          </form>
-        <% } %>
+        <small class="text-muted"><%= product.category?.name %></small>
+        <div class="fw-bold mt-2" style="color:var(--green);">$<%= product.price.toFixed(2) %></div>
+        <% if (!product.isAvailable) { %><small class="text-danger">Out of stock</small><% } %>
       </div>
     </div>
   </div>
   <% }) %>
 </div>
+<div class="text-center mt-4">
+  <a href="/login" class="btn btn-primary">Login to Order</a>
+</div>
+<% } %>
+
+<script>
+  const prices = { <%- products.map(p => `'${p._id}': ${p.price}`).join(',') %> };
+  const names  = { <%- products.map(p => `'${p._id}': '${p.name.replace(/'/g, "\\'")}'`).join(',') %> };
+  const quantities = {};
+
+  function changeQty(id, delta, maxStock) {
+    const current = quantities[id] || 0;
+    let next = Math.max(0, current + delta);
+    if (maxStock !== undefined) next = Math.min(next, maxStock);
+    quantities[id] = next;
+    document.getElementById('qty-' + id).textContent = next;
+    const card = document.getElementById('card-' + id);
+    card.style.outline = next > 0 ? '2px solid var(--green)' : '';
+    updateSummary();
+  }
+
+  function clearCart() {
+    Object.keys(quantities).forEach(id => {
+      quantities[id] = 0;
+      const el = document.getElementById('qty-' + id);
+      if (el) el.textContent = '0';
+      const card = document.getElementById('card-' + id);
+      if (card) card.style.outline = '';
+    });
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const list = document.getElementById('summaryList');
+    const hidden = document.getElementById('hiddenInputs');
+    list.innerHTML = '';
+    hidden.innerHTML = '';
+    let total = 0, hasItems = false;
+
+    for (const [id, qty] of Object.entries(quantities)) {
+      if (qty < 1) continue;
+      hasItems = true;
+      const subtotal = prices[id] * qty;
+      total += subtotal;
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center py-2';
+      li.innerHTML = `<span>${names[id]} <span class="badge bg-secondary ms-1">×${qty}</span></span>
+                      <span class="fw-semibold">$${subtotal.toFixed(2)}</span>`;
+      list.appendChild(li);
+      hidden.innerHTML += `<input type="hidden" name="productIds[]" value="${id}">
+                           <input type="hidden" name="quantities[]" value="${qty}">`;
+    }
+
+    if (!hasItems) {
+      list.innerHTML = `<li class="list-group-item text-muted small py-3 text-center">
+        <i class="bi bi-bag-x d-block mb-1" style="font-size:1.5rem;"></i>Add items from the menu</li>`;
+    }
+
+    document.getElementById('totalDisplay').textContent = '$' + total.toFixed(2);
+    document.getElementById('submitBtn').disabled = !hasItems;
+  }
+</script>
 <%- include('../partials/footer') %>

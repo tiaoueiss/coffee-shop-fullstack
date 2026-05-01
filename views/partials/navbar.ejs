@@ -23,9 +23,7 @@
           <% if (user.role === 'admin' || user.role === 'employee') { %>
             <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
           <% } %>
-          <% if (user.role === 'admin') { %>
-            <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
-          <% } %>
+          <li class="nav-item"><a class="nav-link" href="/feedback">Feedback</a></li>
         <% } %>
       </ul>
       <ul class="navbar-nav align-items-center gap-2">

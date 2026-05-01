@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { attachUser } = require('../middleware/authMiddleware');
 
+// we pass attach user because these pages need to know wether user is already logged in
 router.get('/', attachUser, (req, res) => {
   if (req.user) return res.redirect('/dashboard');
   res.redirect('/login');

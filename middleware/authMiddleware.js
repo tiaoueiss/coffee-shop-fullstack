@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-// Strict — blocks unauthenticated requests
+// checks if user is logged in, if not redirects to login page
 exports.requireAuth = (req, res, next) => {
   const token = req.cookies?.token;
   if (!token) return res.redirect('/login');
@@ -14,7 +14,7 @@ exports.requireAuth = (req, res, next) => {
   }
 };
 
-// Soft — attaches user if logged in, never blocks
+// attaches user to req and res.locals if token is valid, otherwise clears cookie
 exports.attachUser = (req, res, next) => {
   const token = req.cookies?.token;
   if (token) {
@@ -28,7 +28,7 @@ exports.attachUser = (req, res, next) => {
   next();
 };
 
-// Role gate — call after requireAuth
+// checks if user has one of the required roles, if not shows access denied error
 exports.requireRole = (...roles) => (req, res, next) => {
   if (!req.user || !roles.includes(req.user.role)) {
     return res.status(403).render('error', { message: 'Access denied' });

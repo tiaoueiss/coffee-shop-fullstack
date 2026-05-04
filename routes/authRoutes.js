@@ -6,8 +6,9 @@ const { attachUser } = require('../middleware/authMiddleware');
 // we pass attach user because these pages need to know wether user is already logged in
 router.get('/', attachUser, (req, res) => {
   if (req.user) return res.redirect('/dashboard');
-  res.redirect('/login');
+  res.render('auth/main');
 });
+
 
 router.get('/register', attachUser, authController.showRegisterForm);
 router.post('/register', authController.register);

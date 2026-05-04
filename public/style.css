@@ -1,6 +1,5 @@
 /* ── Variables ────────────────────────────────────────────── */
 :root {
-  --green:       #217454;
   --green-dark:  #0d5e36;
   --green-light: #e8f5ef;
   --brown:       #6F4E37;
@@ -26,13 +25,20 @@ body {
 
 main { flex: 1; }
 
+.stories-footer {
+  background-color: var(--green-dark);
+  padding: 0.6rem 0;
+  color: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
 h1, h2, h3, h4, h5, h6,
 .page-title, .navbar-brand {
   font-family: 'Epilogue', sans-serif;
 }
 
 /* ── Navbar ───────────────────────────────────────────────── */
-.stories-nav {
+.stories-nav  {
   background-color: var(--green-dark);
   padding: 0.6rem 0;
   box-shadow: 0 2px 12px rgba(0,0,0,0.12);
@@ -49,8 +55,8 @@ h1, h2, h3, h4, h5, h6,
 
 /* ── Buttons ──────────────────────────────────────────────── */
 .btn-primary {
-  background-color: var(--green);
-  border-color: var(--green);
+  background-color: var(--dark-green);
+  border-color: var(--green-dark);
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -59,8 +65,8 @@ h1, h2, h3, h4, h5, h6,
   border-color: var(--green-dark);
 }
 .btn-coffee {
-  background-color: var(--green);
-  border-color: var(--green);
+  background-color: var(--green-dark);
+  border-color: var(--green-dark);
   color: #fff;
   font-weight: 600;
 }
@@ -104,13 +110,13 @@ h1, h2, h3, h4, h5, h6,
 .page-title {
   color: var(--green-dark);
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0rem;
   font-size: 1.6rem;
 }
 
 /* ── Stat cards ───────────────────────────────────────────── */
 .stat-card {
-  border-left: 3px solid var(--green);
+  border-left: 3px solid var(--green-dark);
   background: #fff;
 }
 .stat-card .text-muted { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -118,7 +124,7 @@ h1, h2, h3, h4, h5, h6,
 
 /* ── Status badges ────────────────────────────────────────── */
 .badge-pending   { background-color: #b87333; color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
-.badge-completed { background-color: var(--green); color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
+.badge-completed { background-color: var(--green-dark); color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
 .badge-cancelled { background-color: #7a3b2e; color: #fff; padding: 4px 10px; border-radius: 20px; font-size:0.75rem; }
 
 /* ── Role filter pills ────────────────────────────────────── */
@@ -133,8 +139,8 @@ h1, h2, h3, h4, h5, h6,
   text-decoration: none;
   transition: all 0.15s;
 }
-.role-pill:hover { border-color: var(--green); color: var(--green); }
-.role-pill.active { background: var(--green); border-color: var(--green); color: #fff; }
+.role-pill:hover { border-color: var(--green-dark); color: var(--green-dark); }
+.role-pill.active { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
 
 /* ── Stars ────────────────────────────────────────────────── */
 .stars { color: var(--brown); }
@@ -147,7 +153,7 @@ label { font-weight: 500; font-size: 0.875rem; color: var(--text-muted); }
   font-size: 0.9rem;
 }
 .form-control:focus, .form-select:focus {
-  border-color: var(--green);
+  border-color: var(--green-dark);
   box-shadow: 0 0 0 3px rgba(33,116,84,0.12);
 }
 
